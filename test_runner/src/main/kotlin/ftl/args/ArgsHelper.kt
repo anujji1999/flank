@@ -225,7 +225,7 @@ object ArgsHelper {
         } else {
             val oldTestResult = GcStorage.downloadJunitXml(args) ?: JUnitTestResult(mutableListOf())
             val shardCount = forcedShardCount ?: shardCountByTime(testsToExecute, oldTestResult, args)
-            createShardsByShardCount(testsToExecute, oldTestResult, args, shardCount)
+            createShardsByShardCount(testsToExecute, oldTestResult, args, shardCount).map { Chunk(it.testMethods) }
         }
 
         return CalculateShardsResult(testMethodsAlwaysRun(shards, args), ignoredTestCases = ignoredTests.map { it.testName })
@@ -241,6 +241,7 @@ object ArgsHelper {
 
 data class Chunk(val testMethods: List<TestMethod>) {
     val testStringList = testMethods.map { it.name }
+    val size get() = testMethods.size
 }
 
 fun String.normalizeFilePath(): String =
